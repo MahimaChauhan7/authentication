@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth Website</title>
+</head>
+<body>
+    <div>
+        <h2>Signup</h2>
+        <input id="signup_username" type="text" placeholder="Username" />
+        <input id="signup_password" type="password" placeholder="Password" />
+        <button onclick="signup()">Submit</button>
+    </div>
+    <div>
+        <h2>Signin</h2>
+        <input id="signin_username" type="text" placeholder="Username" />
+        <input id="signin_password" type="password" placeholder="Password" />
+        <button onclick="signin()">Submit</button>
+    </div>
+    <div>
+        <h2>Information</h2>
+        <div id="information"></div>
+        <button onclick="getInformation()">Get Information</button>
+    </div>
+    <div>
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+    async function signup() {
+        const username = document.getElementById("signup_username").value;
+        const password = document.getElementById("signup_password").value;
+        try {            await axios.post("http://localhost:8080/signup", {
+                username: username,
+                password: password
+            });
+            alert("You are signed up");
+        } catch (error) {
+            alert("Error signing up: " + error.response?.data?.message || error.message);
+        }
+    }
+
+    async function signin() {
+        try {
+            const username = document.getElementById("signin_username").value;
+            const password = document.getElementById("signin_password").value;
+            const response = await axios.post("http://localhost:8080/signin", {
+                username: username,
+                password: password
+            });
+            localStorage.setItem("token", response.data.token);
+            alert("You are signed in");
+        } catch (error) {
+            alert("Error signing in: " + error.response?.data?.message || error.message);
+        }
+    }
+
+    async function getInformation() {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                alert("Please sign in first");
+                return;
+            }
+            const response = await axios.get("http://localhost:8080/me", {
+                headers: {
+                    'Authorization': token
+                }
+            });
+            document.getElementById("information").innerHTML = "Username: " + response.data.username;
+        } catch (error) {
+            alert("Error getting information: " + error.response?.data?.message || error.message);
+        }
+    }
+
+    async function logout() {
+        localStorage.removeItem("token");
+        document.getElementById("information").innerHTML = "";
+        alert("You have been logged out");
+    }
+
+</script>
+
+<head>
+    <title>
+        Auth Website
+    </title>
+</head>
+
+<body>
+    <div>
+        Signup
+        <input id="singup_username" type="text" placeholder="Username" />
+        <input id="signup_password" type="text" placeholder="password" />
+        <button onclick="signup()">submit</button>
+    </div>
+    <div>
+        Signin
+        <input id="singin_username" type="text" placeholder="Username">Username</input>
+        <input id="singin_passowrd" type="text" placeholder="password">password</input>
+        <button onclick="signin()">submit</button>
+
+    </div>
+    <div>
+        Information
+        <div id="information">
+            <button onclick="Getinformation()">Get</button>
+        </div>
+
+
+    </div>
+    <div>
+        <button onclick="logout()">Logout</button>
+    </div>
+</body>
+
+</html>
